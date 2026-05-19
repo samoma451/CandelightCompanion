@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name" : "Candlelight Companion",
+    "version" : "0.1.0", 
+    "description" : "A fiery task handler companion",
+
+    "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "public/icons/icon 32x32.png",
+      "48": "public/icons/icon 32x32.png",
+      "128": "public/icons/icon 32x32.png"
+    }
+  }
+}
