@@ -68,3 +68,27 @@ body {
 button {
   flex: 1;
 }
+
+.scene {
+  position: center;
+  width: 128px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sprite {
+  width: 32px;
+  height: 32px;
+
+  transform: scale(5); /* scale up pixel art */
+  transform-origin: center;
+
+  background-image: url("assets/sprites/test spritesheet.png");
+  background-repeat: no-repeat;
+
+  image-rendering: pixelated;
+
+
+}
