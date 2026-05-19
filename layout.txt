@@ -1,0 +1,23 @@
+┌──────────────────────────────┐
+│          Header              │
+│  Status / Mood / Title       │
+├──────────────────────────────┤
+│                              │
+│        Scene Area            │
+│   ┌──────────────────────┐   │
+│   │   Background (256x)  │   │
+│   │   + Character Sprite │   │
+│   │   (center focus)     │   │
+│   └──────────────────────┘   │
+│                              │
+├──────────────────────────────┤
+│ Current Task                 │
+│ "Write README / Focus work"  │
+├──────────────────────────────┤
+│ Pomodoro Timer               │
+│   25:00  ● running state     │
+│   [start] [pause] [reset]    │
+├──────────────────────────────┤
+│ Controls                     │
+│ [Add Task] [Skip] [Settings] │
+└──────────────────────────────┘

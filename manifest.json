@@ -5,11 +5,11 @@
     "description" : "A fiery task handler companion",
 
     "action": {
-    "default_popup": "src/popup/popup.html",
+    "default_popup": "popup.html",
     "default_icon": {
-      "16": "public/icons/icon 32x32.png",
-      "48": "public/icons/icon 32x32.png",
-      "128": "public/icons/icon 32x32.png"
+      "16": "icons/icon 32x32.png",
+      "48": "icons/icon 32x32.png",
+      "128": "icons/icon 32x32.png"
     }
   }
 }
