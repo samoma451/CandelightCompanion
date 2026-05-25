@@ -1,0 +1,53 @@
+{
+  "SESSION_START": {
+    "mood": "focus",
+    "variants": [
+      "I’ll stay with you while you begin.",
+      "The path is open.",
+      "We start gently."
+    ]
+  },
+  "SESSION_PAUSE": {
+    "mood": "paused",
+    "variants": [
+      "Still here.",
+      "We can return when ready.",
+      "No rush."
+    ]
+  },
+  "SESSION_RESUME": {
+    "mood": "focus",
+    "variants": [
+      "We return gently.",
+      "The flame is still here.",
+      "One step at a time."
+    ]
+  },
+  "SESSION_COMPLETE": {
+    "mood": "celebrate",
+    "variants": [
+      "That was a steady session.",
+      "We made progress together.",
+      "The work is enough for now.",
+      "You can rest here for a moment."
+    ]
+  },
+  "TASK_COMPLETE": {
+    "mood": "celebrate",
+    "variants": [
+      "That’s done for now.",
+      "We’ve finished this step.",
+      "The work is complete.",
+      "A small light carried forward."
+    ]
+  },
+  "IDLE_RETURN": {
+    "mood": "idle",
+    "variants": [
+      "Start when you’re ready.",
+      "No need to rush.",
+      "I’ll keep you company while you work.",
+      "The flame is still here."
+    ]
+  }
+}

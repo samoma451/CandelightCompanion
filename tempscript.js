@@ -1,129 +1,6 @@
 console.log("SCRIPT LOADED");
 
 // ----------------------------
-// CONSTANTS & STORAGE HELPERS
-// ----------------------------
-
-const ALARM_FOCUS_COMPLETE = "focusTimerComplete";
-const DIALOGUE_PATH = "assets/dialogue/dialogue.json";
-
-//This is the shape the extension expects in chrome.storage. Any missing fields will be filled in with defaults from DEFAULT_STATE.
-const DEFAULT_STATE = {
-  tasks: [],
-  activeTaskId: null,
-  timer: {
-    mode: "idle",
-    startTime: null,
-    durationMinutes: 25,
-    remainingMs: null
-  },
-  sessions: [],
-  stats: {
-    sessionsCompleted: 0,
-    totalFocusMinutes: 0
-  },
-  companion: {
-    mood: "idle",
-    message: "Start when you're ready.",
-    lastEventAt: null,
-    lastdialogueEvent: null,
-    lastdialogueMessage: null
-  }
-};
-
-// Used if the dialogue JSON cannot be loaded.
-const FALLBACK_DIALOGUES = {
-  SESSION_START: {
-    mood: "focus",
-    variants: ["We start gently."]
-  },
-  SESSION_PAUSE: {
-    mood: "paused",
-    variants: ["Still here."]
-  },
-  SESSION_RESUME: {
-    mood: "focus",
-    variants: ["We return gently."]
-  },
-  SESSION_COMPLETE: {
-    mood: "celebrate",
-    variants: ["That was a steady session."]
-  },
-  TASK_COMPLETE: {
-    mood: "celebrate",
-    variants: ["That's done for now."]
-  },
-  IDLE_RETURN: {
-    mood: "idle",
-    variants: ["Start when you're ready."]
-  }
-};
-
-//storage helpers
-function isChromeStorageAvailable() {
-  return typeof chrome !== "undefined" && chrome.storage?.local;
-}
-
-// Combines saved data with DEFAULT_STATE.
-// This prevents old or incomplete saved data from breaking the popup.
-function mergeState(saved = {}) {
-  return {
-    ...DEFAULT_STATE,
-    ...saved,
-    timer: {
-      ...DEFAULT_STATE.timer,
-      ...(saved.timer || {})
-    },
-    stats: {
-      ...DEFAULT_STATE.stats,
-      ...(saved.stats || {})
-    },
-    companion: {
-      ...DEFAULT_STATE.companion,
-      ...(saved.companion || {})
-    },
-    tasks: Array.isArray(saved.tasks) ? saved.tasks : [],
-    sessions: Array.isArray(saved.sessions) ? saved.sessions : []
-  };
-}
-
-async function loadState() {
-  if (!isChromeStorageAvailable()) {
-    return structuredClone(DEFAULT_STATE);
-  }
-
-  // Passing DEFAULT_STATE asks Chrome for each matching top-level key.
-  // Missing keys come back with the default values.
-  const saved = await chrome.storage.local.get(DEFAULT_STATE);
-
-  return mergeState(saved);
-}
-
-async function saveState(nextState) {
-  state = mergeState(nextState);
-
-  if (isChromeStorageAvailable()) {
-    await chrome.storage.local.set(state);
-  }
-
-  render();
-}
-
-// ----------------------------
-// RUNTIME STATE
-// ----------------------------
-
-// Local copy of the saved extension state
-//   update whenever we save or load from chrome.storage.local
-let state = structuredClone(DEFAULT_STATE);
-
-// Dialogue loaded from assets/dialogue/dialogues.json.
-let dialogues = FALLBACK_DIALOGUES;
-
-// Cached DOM elements go here after cacheElements() runs.
-const els = {};
-
-// ----------------------------
 // Safe DOM helper
 // ----------------------------
 
@@ -133,94 +10,22 @@ function getEl(selector) {
   return el;
 }
 
-
-function cacheElements() {
-  els.scene = getEl(".scene");
-  els.companionMessage = getEl(".companion-message");
-
-  els.activeStep = getEl(".active-step");
-  els.addStepForm = getEl("#addStepForm");
-  els.stepInput = getEl("#stepInput");
-  els.queueList = getEl(".queue-list");
-
-  els.timer = getEl(".timer");
-  els.startBtn = getEl("#startBtn");
-  els.pauseBtn = getEl("#pauseBtn");
-  els.resetBtn = getEl("#resetBtn");
-
-  els.completionPrompt = getEl(".completion-prompt");
-  els.markDoneBtn = getEl("#markDoneBtn");
-  els.leaveOpenBtn = getEl("#leaveOpenBtn");
-
-  els.statsSummary = getEl(".stats-summary");
-}
-
-
 // ----------------------------
-// DIALOGUE HANDLING
+// Global state
 // ----------------------------
 
-async function loaddialogues() {
-  try {
-    const url = chrome.runtime.getURL(DIALOGUE_PATH);
-    const response = await fetch(url);
+const state = {
+  tasks: [],
+  activeTaskId: null,
+  mood: "idle",
+  background: null
+};
 
-    if (!response.ok) {
-      throw new Error(`Dialogue fetch failed: ${response.status}`);
-    }
-
-    dialogues = await response.json();
-  } catch (error) {
-    console.warn("[Dialogue] Falling back to built-in dialogues", error);
-    dialogues = FALLBACK_DIALOGUES;
-  }
-}
-
-function pickdialogue(event) {
-  const dialogue = dialogues[event];
-
-  // If the event is missing from the dialogue file, keep the current companion state.
-  if (!dialogue || !Array.isArray(dialogue.variants) || !dialogue.variants.length) {
-    return {
-      mood: state.companion.mood,
-      message: state.companion.message
-    };
-  }
-
-  // Avoid showing the same line twice in a row when possible.
-  const available =
-    dialogue.variants.length > 1
-      ? dialogue.variants.filter(message => message !== state.companion.lastdialogueMessage)
-      : dialogue.variants;
-
-  const message = available[Math.floor(Math.random() * available.length)];
-
-  return {
-    mood: dialogue.mood || state.companion.mood,
-    message
-  };
-}
-
-// Creates the companion state update for a specific event.
-function applydialogue(event) {
-  const dialogue = pickdialogue(event);
-
-  return {
-    mood: dialogue.mood,
-    message: dialogue.message,
-    lastEventAt: Date.now(),
-    lastdialogueEvent: event,
-    lastdialogueMessage: dialogue.message
-  };
-}
-
-
+let taskListEl;
 
 // ----------------------------
 // TASK SYSTEM
 // ----------------------------
-
-let taskListEl;
 
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(state.tasks));

@@ -3,7 +3,9 @@
     "name" : "Candlelight Companion",
     "version" : "0.1.0", 
     "description" : "A fiery task handler companion",
-    "permissions": ["storage"],
+    "permissions": ["storage", "alarms"],
+    "background": { 
+      "service_worker": "background.js" },
 
     "action": {
     "default_popup": "popup.html",
